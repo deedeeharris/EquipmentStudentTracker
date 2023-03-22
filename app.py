@@ -8,17 +8,69 @@ csv_path = st.secrets["csvurl"]
 # Load the data from the CSV file into a Pandas DataFrame
 df = pd.read_csv(csv_path)
 
-# download button args
+# Setting up download button arguments
 download_status = True
 csv = ''
 file_name = ''
 
-# preprocessing
+# Preprocessing the DataFrame
 df.rename(columns={'Timestamp': 'Time signed'}, inplace=True)
 df.rename(columns={'Please enter your TZ number.': 'TZ Number'}, inplace=True)
 
+mandatory_items = ['Breadboard', 'D18B20 (Digital Temperature Sensor)',
+       'FireBeetle-ESP32 (MCU)', 'LEDs (small lights)',
+       'OLED Display (screen)', 'Plastic Box', 'Resistors Set',
+       'SHT3X (Temperature / Humidity Sensor)', 'Thermistor (10K)',
+       'USB type-C cable']
+
+def missing_items_per_user(df, mandatory_items):
+  def filter_and_check(df):
+      # Create an empty dictionary to store filtered DataFrames and missing items for each email address
+      filtered_dict = {}
+      missing_items_dict = {}
+
+      # Iterate over unique email addresses in the DataFrame
+      for email in df['Email Address'].unique():
+          # Create a filtered DataFrame for each email
+          filtered_df = df[df['Email Address'] == email]
+
+          # Add filtered DataFrame to dictionary
+          filtered_dict[email] = filtered_df
+
+          # Check which sensor values are not in filtered DataFrame
+          missing_items = []
+          for sensor in mandatory_items:
+              if sensor not in filtered_df['Sensor Name / Model Number'].values:
+                  missing_items.append(sensor)
+
+          # Add missing items list to dictionary for this email address
+          missing_items_dict[email] = missing_items
+
+      # Return filtered dictionary and missing items dictionary
+      return filtered_dict, missing_items_dict
 
 
+  # Call the filter_and_check function to create filtered DataFrames and missing item lists
+  filtered_dict, missing_items_dict = filter_and_check(df)
+
+  # Print missing items for each email
+  for email, missing_items in missing_items_dict.items():
+    if len(missing_items) >0:
+      # Extract the text before the @ sign
+      username = email.split("@")[0]
+      # Split the username into first and last name
+      first_name = username.split(".")[0].capitalize()
+      last_name = username.split(".")[1].capitalize()
+
+
+      st.markdown(f'*{first_name} {last_name}:*')
+      st.text(missing_items)
+      st.text('')
+
+
+
+# streamlit app
+# Setting up Streamlit page configuration
 favicon = 'favicon.png'
 st.set_page_config(page_title="AgTech Personal Equipment", page_icon=favicon, layout="centered")
 st.title("AgTech Personal Equipment List")
@@ -35,6 +87,7 @@ st.markdown('''
 st.markdown('Yedidya @ https://agrotech-lab.github.io')
 
 def load_items (email, tz_number, capitalized_name):
+    # Filtering data based on user inputs
     if email and tz_number:
         filtered_df = df[(df["Email Address"] == email) & (df["TZ Number"] == tz_number)]
         filtered_df = filtered_df.reset_index(drop=True)
@@ -49,11 +102,11 @@ def load_items (email, tz_number, capitalized_name):
         return filtered_df
 
 def convert_df(df):
-   return df.to_csv(index=False).encode('utf-8')
+    # Converting filtered data to CSV format
+    return df.to_csv(index=False).encode('utf-8')
 
 
-#col1, col2, col3 = st.columns(3)
-#with col1:
+# Setting up input fields for email address and TZ number
 st.markdown("#### Enter your email address and Teudat Zehut (TZ) number:")
 
 with st.form("my_form"):
@@ -65,15 +118,16 @@ with st.form("my_form"):
     
     # Every form must have a submit button.
     submitted = st.form_submit_button("Submit")
-    if submitted:
+    if submitted: # If the form has been submitted, this block of code is executed.
         filtered_df = load_items (email, tz_number, capitalized_name)  
-        
         csv = convert_df(filtered_df)     
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         download_status = False
         file_name = f'Agtech_Equipment_{capitalized_name}_{timestamp}.csv'
 
-# download csv button
+
+
+# This line creates a download button that allows the user to download the CSV file.
 st.download_button(
    "Download As CSV",
    csv,
@@ -82,6 +136,8 @@ st.download_button(
    key='download-csv',
    disabled=download_status
 )
+
+missing_items_per_user(df, mandatory_items)
 
 
         
