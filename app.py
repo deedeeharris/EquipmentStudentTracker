@@ -137,7 +137,7 @@ st.download_button(
    disabled=download_status
 )
 
-#missing_items_per_user(df, mandatory_items)
+missing_items_per_user(df, mandatory_items)
 
 
         
