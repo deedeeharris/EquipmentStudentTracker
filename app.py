@@ -25,7 +25,7 @@ mandatory_items = ['Breadboard', 'D18B20 (Digital Temperature Sensor)',
        'USB type-C cable']
 
 def check_admin(user,password):
-    st.text('hello')   
+ 
     if user == st.secrets["adminuser"]:
         if password == st.secrets["password"]:
             
@@ -192,8 +192,6 @@ st.download_button(
 
 # admin buttons, just if admin and password were inserted
 check_admin(email,tz_number)
-missing_items_per_user(df, mandatory_items)
-
 
         
 
