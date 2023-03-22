@@ -1,6 +1,6 @@
 # AgTech Personal Equipment List
 
-Welcome to the [AgTech (71252)](https://agrotech-lab.github.io/) Personal Equipment List app! This handy tool allows you to easily view the sensors and equipment that you have signed up for on the pickup form. 
+Welcome to the [AgTech Cource](https://agrotech-lab.github.io/) Personal Equipment List app! This handy tool allows you to easily view the sensors and equipment that you have signed up for on the pickup form. 
 
 Simply enter your email address and Teudat Zehut (TZ) number, and the app will display a list of the items assigned to you. Keep track of your assigned equipment throughout the course and ensure that you have everything you need to succeed.
 
