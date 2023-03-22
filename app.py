@@ -5,6 +5,7 @@ from datetime import datetime
 # Store the CSV file path as a secret
 csv_path = st.secrets["csvurl"]
 
+
 # Load the data from the CSV file into a Pandas DataFrame
 df = pd.read_csv(csv_path)
 
@@ -22,6 +23,57 @@ mandatory_items = ['Breadboard', 'D18B20 (Digital Temperature Sensor)',
        'OLED Display (screen)', 'Plastic Box', 'Resistors Set',
        'SHT3X (Temperature / Humidity Sensor)', 'Thermistor (10K)',
        'USB type-C cable']
+
+def check_admin(user,password):
+    if user == st.secrets["adminuser"]:
+        if password == st.secrets["password"]:
+            download_status = True
+            missing_items_but = st.button('Missing Items Per User')
+            missing_items_but2 = st.button('Users Per Missing Items')
+            
+            if missing_items_but: # If the form has been submitted, this block of code is executed.         
+                missing_items_per_user(df, mandatory_items)
+            if missing_items_but2: # If the form has been submitted, this block of code is executed.    
+                users_per_missing_items(df, mandatory_items)
+                
+def users_per_missing_items(df, mandatory_items):
+
+  def filter_and_check(df):
+      # Create an empty dictionary to store filtered DataFrames and sensor values
+      filtered_dict = {}
+      values_dict = {sensor: [] for sensor in mandatory_items}
+
+      # Iterate over unique email addresses in the DataFrame
+      for email in df['Email Address'].unique():
+          # Create a filtered DataFrame for each email
+          filtered_df = df[df['Email Address'] == email]
+
+          # Add filtered DataFrame to dictionary
+          filtered_dict[email] = filtered_df
+
+          # Check which sensor values are not in filtered DataFrame
+          for sensor in values_dict:
+              if sensor not in filtered_df['Sensor Name / Model Number'].values:
+                  # Extract the text before the @ sign
+                  username = email.split("@")[0]
+                  # Split the username into first and last name
+                  first_name = username.split(".")[0].capitalize()
+                  last_name = username.split(".")[1].capitalize()
+
+                  values_dict[sensor].append(f'{first_name} {last_name}')
+
+      # Return filtered dictionary and values dictionary
+      return filtered_dict, values_dict
+
+  # Call the filter_and_check function to create filtered DataFrames and sensor value lists
+  filtered_dict, values_dict = filter_and_check(df)
+
+
+  # Print sensor value lists
+  for sensor, values in values_dict.items():
+      st.markdown(f'**{sensor}:**')
+      st.text(values)
+      st.text('')        
 
 def missing_items_per_user(df, mandatory_items):
   def filter_and_check(df):
@@ -63,7 +115,7 @@ def missing_items_per_user(df, mandatory_items):
       last_name = username.split(".")[1].capitalize()
 
 
-      st.markdown(f'*{first_name} {last_name}:*')
+      st.markdown(f'**{first_name} {last_name}:**')
       st.text(missing_items)
       st.text('')
 
@@ -119,13 +171,12 @@ with st.form("my_form"):
     # Every form must have a submit button.
     submitted = st.form_submit_button("Submit")
     if submitted: # If the form has been submitted, this block of code is executed.
+        
         filtered_df = load_items (email, tz_number, capitalized_name)  
         csv = convert_df(filtered_df)     
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         download_status = False
         file_name = f'Agtech_Equipment_{capitalized_name}_{timestamp}.csv'
-
-
 
 # This line creates a download button that allows the user to download the CSV file.
 st.download_button(
@@ -137,7 +188,9 @@ st.download_button(
    disabled=download_status
 )
 
-missing_items_per_user(df, mandatory_items)
+# admin buttons, just if admin and password were inserted
+check_admin(email,tz_number)
+
 
 
         
