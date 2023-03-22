@@ -15,4 +15,5 @@ Simply enter your email address and Teudat Zehut (TZ) number, and the app will d
 4. View the list of equipment assigned to you
 
 Enjoy,
+
 Yedidya Harris
