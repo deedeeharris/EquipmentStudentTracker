@@ -192,7 +192,7 @@ st.download_button(
 
 # admin buttons, just if admin and password were inserted
 check_admin(email,tz_number)
-
+missing_items_per_user(df, mandatory_items)
 
 
         
