@@ -27,6 +27,7 @@ mandatory_items = ['Breadboard', 'D18B20 (Digital Temperature Sensor)',
 def check_admin(user,password):
     if user == st.secrets["adminuser"]:
         if password == st.secrets["password"]:
+            st.text('hello')
             download_status = True
             missing_items_but = st.button('Missing Items Per User')
             missing_items_but2 = st.button('Users Per Missing Items')
