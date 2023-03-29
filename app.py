@@ -22,7 +22,7 @@ mandatory_items = ['Breadboard', 'D18B20 (Digital Temperature Sensor)',
        'FireBeetle-ESP32 (MCU)', 'LEDs (small lights)',
        'OLED Display (screen)', 'Plastic Box', 'Resistors Set',
        'SHT3X (Temperature / Humidity Sensor)', 'Thermistor (10K)',
-       'USB type-C cable']
+       'USB type-C cable', 'Relay', 'Potentiometer', 'Button']
 
 def check_admin(user,password):
  
